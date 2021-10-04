@@ -38,7 +38,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	color, err := colorx.GetProminentColor(data)
+	color, _, err := colorx.GetProminentColor(data)
 	if err != nil {
 		log.Fatal(err)
 	}
