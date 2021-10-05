@@ -20,19 +20,42 @@ import (
 	"bytes"
 	"fmt"
 	"image"
+	"math"
 	"strconv"
 
 	"image/color"
 	_ "image/jpeg"
 	_ "image/png"
 
+	"golang.org/x/image/draw"
 	_ "golang.org/x/image/webp"
 )
 
+const MAX_PIXELS = 20000
+
+// getResizedDims resizes the image to have 20000px or under while keeping the aspect ratio
+func getResizedDims(width, height int) (int, int) {
+	imagePixels := width * height
+
+	// reference for equation: https://www.wyzant.com/resources/answers/91621/find_two_positive_numbers_whose_ratio_is_2_3_and_whose_product_is_600
+	scale := math.Sqrt(float64(MAX_PIXELS) / float64(imagePixels))
+
+	newWidth := scale * float64(width)
+	newHeight := scale * float64(height)
+
+	return int(newWidth), int(newHeight)
+}
+
 // downsampleImage downsamples images larger than 20000px for faster image processing.
-func downsampleImage(img image.Image) image.Image {
-	// TODO: implement downsampling
-	return img
+func downsampleImage(img image.Image, width int, height int) image.Image {
+	dstWidth, dstHeight := getResizedDims(width, height)
+
+	dstRect := image.Rect(0, 0, dstWidth, dstHeight)
+	dst := image.NewRGBA(dstRect)
+
+	draw.NearestNeighbor.Scale(dst, dstRect, img, img.Bounds(), draw.Over, nil)
+
+	return dst
 }
 
 // calculateColorMap loops through the image pixels and creates a map-
@@ -69,8 +92,8 @@ func GetProminentColor(data []byte) (string, color.Color, error) {
 	pixels := height * width
 
 	// image is too big, downsample to a reasonable size
-	if pixels > 20000 {
-		img = downsampleImage(img)
+	if pixels > MAX_PIXELS {
+		img = downsampleImage(img, width, height)
 	}
 
 	colorMap := calculateColorMap(img, width, height)
