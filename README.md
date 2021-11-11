@@ -12,3 +12,4 @@ Currently ColorX supports these image formats:
 - png
 - jpeg
 - webp
+- gif

@@ -24,6 +24,7 @@ import (
 	"strconv"
 
 	"image/color"
+	_ "image/gif"
 	_ "image/jpeg"
 	_ "image/png"
 
@@ -99,12 +100,12 @@ func GetProminentColor(data []byte) (string, color.Color, error) {
 	colorMap := calculateColorMap(img, width, height)
 
 	var maxColor color.Color
-	maxAmmount := 0
+	maxAmount := 0
 
 	for color, amount := range colorMap {
-		if amount > maxAmmount {
+		if amount > maxAmount {
 			maxColor = color
-			maxAmmount = amount
+			maxAmount = amount
 		}
 	}
 
